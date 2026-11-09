@@ -1,0 +1,928 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#08192f">
+<title>آزمایشگاه تعاملی علوم | تقطیر ساده</title>
+<style>
+:root{
+  --bg:#07172b;--panel:#0d223c;--panel2:#112b49;--line:#274865;--text:#edf7ff;--muted:#a9c1d4;
+  --blue:#3c9cf2;--cyan:#42d6d0;--orange:#ff9b47;--yellow:#ffd166;--red:#ff5e57;--green:#64d6a5;
+  --header-h:56px;--footer-h:116px;--radius:14px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:Tahoma,"Segoe UI",Arial,sans-serif}
+body{height:100dvh;min-height:0}
+button,input{font:inherit}
+button{color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:2px solid #80e6f0;outline-offset:2px}
+#app{height:100%;height:100dvh;display:flex;flex-direction:column;min-height:0;background:radial-gradient(ellipse at 48% 46%,#102a48 0%,#081a31 52%,#061426 100%)}
+.topbar{height:var(--header-h);flex:0 0 var(--header-h);display:flex;align-items:center;gap:12px;padding:0 16px;background:#091a30;border-bottom:1px solid #24415c;box-shadow:0 4px 18px #0003;z-index:4}
+.brand{display:flex;align-items:center;gap:10px;min-width:260px;flex:1;white-space:nowrap;overflow:hidden}
+.brand-mark{width:31px;height:31px;border-radius:9px;display:grid;place-items:center;background:linear-gradient(145deg,#2b91dd,#36c9c0);box-shadow:0 5px 13px #1da5ba44;font-size:19px;flex:none}
+.brand-title{font-size:clamp(12px,1.08vw,16px);font-weight:800;overflow:hidden;text-overflow:ellipsis}
+.brand-sub{font-size:10px;color:#8fb0c9;margin-top:2px}
+.top-actions{display:flex;align-items:center;gap:6px;white-space:nowrap}
+.top-btn,.control-btn,.speed-btn{border:1px solid #31506c;background:#122b47;border-radius:9px;padding:7px 10px;font-size:11px;transition:background .2s,border-color .2s,transform .2s;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:34px}
+.top-btn:hover,.control-btn:hover,.speed-btn:hover{background:#1a3a5b;border-color:#58b6d7}
+.top-btn:active,.control-btn:active{transform:translateY(1px)}
+.top-btn.active{background:#124454;border-color:#36c9c0;color:#a9fff1}
+.top-btn .ico{font-size:15px;line-height:1}
+.main{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 304px;gap:12px;padding:12px 14px 10px}
+.stage-panel{position:relative;min-width:0;min-height:0;border:1px solid #21405c;border-radius:16px;overflow:hidden;background:linear-gradient(145deg,#0e2844bd,#081a30e8);box-shadow:inset 0 1px #ffffff08,0 12px 25px #0002}
+.stage-head{position:absolute;top:12px;right:16px;left:16px;display:flex;align-items:center;justify-content:space-between;z-index:2;pointer-events:none;gap:10px}
+.stage-kicker{font-size:11px;color:#91b5cf;letter-spacing:.1px}
+.status-pill{border:1px solid #335571;background:#0b2038d9;border-radius:30px;padding:5px 10px;color:#cae6f5;font-size:10px;white-space:nowrap}
+.status-pill b{color:#74e1d7;margin-left:4px}
+#apparatus{width:100%;height:100%;display:block;touch-action:pan-y}#mobileApparatus{display:none;touch-action:pan-y}
+.side-panel{min-width:0;min-height:0;display:flex;flex-direction:column;gap:9px;overflow:hidden}
+.info-card{border:1px solid #24435f;border-radius:14px;background:linear-gradient(150deg,#112b48eF,#0c2038f2);padding:12px 13px;box-shadow:0 8px 18px #0002;min-height:0}
+.info-card h2{font-size:12px;margin:0 0 9px;color:#dff5ff;display:flex;align-items:center;gap:7px}
+.info-card h2 .dot{width:7px;height:7px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px #42d6d0}
+.stage-card{flex:0 0 auto}
+.stage-list{display:flex;flex-direction:column;gap:5px}
+.stage-item{display:flex;align-items:center;gap:8px;min-height:25px;padding:4px 7px;border-radius:8px;color:#86a6bf;font-size:10px;border:1px solid transparent;transition:.2s}
+.stage-item .num{width:18px;height:18px;border:1px solid #45627a;border-radius:50%;display:grid;place-items:center;font-size:9px;flex:none}
+.stage-item.active{color:#e9ffff;background:#0e4651;border-color:#237f83}
+.stage-item.active .num{background:#31bdb7;border-color:#67e6df;color:#052c36;font-weight:bold}
+.stage-item.done{color:#b2d7d5}
+.stage-item.done .num{border-color:#3f9f8a;color:#73e1bd}
+.explain-card{flex:1;display:flex;flex-direction:column;min-height:105px}
+.explain-card p{font-size:11px;line-height:1.9;color:#bfd2e1;margin:0}
+.science-note{font-size:9px;line-height:1.65;color:#f5d39e;border-right:2px solid #d8964c;padding:4px 7px;margin-top:7px;background:#2a251d66;border-radius:5px}
+.reading-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:auto;padding-top:10px}
+.reading{background:#091b30;border:1px solid #203f5a;border-radius:9px;padding:7px 8px;min-width:0}
+.reading small{display:block;font-size:9px;color:#8eacc3;margin-bottom:4px}
+.reading strong{font-size:15px;font-variant-numeric:tabular-nums;color:#f5fbff}
+.reading em{font-style:normal;color:#9db9ce;font-size:9px;margin-right:3px}
+.part-card{flex:0 0 auto;min-height:72px}
+.part-card p{margin:0;font-size:10px;line-height:1.8;color:#b8cfdf}
+.part-name{color:#62e0d5;font-weight:700;margin-bottom:4px;display:block;font-size:11px}
+.fraction-card{flex:0 0 auto}
+.fraction-row{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:10px;color:#a9c1d4;margin-top:7px}
+.fraction-row strong{font-size:12px;color:#fff;font-variant-numeric:tabular-nums}
+.meter{height:6px;background:#203c56;border-radius:10px;overflow:hidden;margin-top:5px}
+.meter>span{height:100%;display:block;width:0;background:linear-gradient(90deg,#36b7d1,#ffb45b);border-radius:10px;transition:width .25s}
+.bottom-bar{height:var(--footer-h);flex:0 0 var(--footer-h);display:grid;grid-template-columns:minmax(280px,1fr) minmax(450px,1.2fr);gap:16px;align-items:center;padding:10px 17px calc(10px + env(safe-area-inset-bottom));background:#091a30;border-top:1px solid #24415c;box-shadow:0 -6px 20px #0003;z-index:3}
+.temp-zone{min-width:0;display:flex;flex-direction:column;justify-content:center;gap:9px}
+.author-credit{font-size:9px;line-height:1.2;color:#789bb6;white-space:nowrap;text-align:right;letter-spacing:0}
+.temp-header{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.temp-label{font-size:11px;color:#bfd3e3;font-weight:700}
+.temp-readout{display:flex;align-items:baseline;gap:5px}
+#tempValue{font-size:25px;line-height:1;font-weight:800;color:#fff;letter-spacing:-.7px;font-variant-numeric:tabular-nums}
+.temp-readout small{font-size:11px;color:#9eb9cd}
+.slider-wrap{position:relative;padding:4px 1px 16px;direction:ltr}
+.temp-gradient{height:9px;border-radius:20px;background:linear-gradient(90deg,#2b87db 0%,#38d4d0 25%,#d2e86c 48%,#ffb347 72%,#ef5146 100%);box-shadow:0 1px 8px #0004;position:relative}
+.ref-mark{position:absolute;top:-5px;width:2px;height:19px;background:#fff;border:1px solid #152a42;box-shadow:0 0 0 1px #ffffff88;z-index:1}
+.ref-mark:after{content:attr(data-label);position:absolute;top:20px;left:50%;transform:translateX(-50%);font:9px Tahoma;color:#b8cede;white-space:nowrap;direction:ltr}
+#tempSlider{position:absolute;inset:-5px 0 2px;width:100%;height:20px;margin:0;background:transparent;appearance:none;-webkit-appearance:none;cursor:pointer;z-index:2;direction:ltr}
+#tempSlider::-webkit-slider-runnable-track{height:9px;background:transparent}
+#tempSlider::-moz-range-track{height:9px;background:transparent}
+#tempSlider::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;width:19px;height:19px;border-radius:50%;background:#fff;border:4px solid #0c314d;box-shadow:0 0 0 2px #d6f7ff,0 2px 7px #0008;margin-top:-5px}
+#tempSlider::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:#fff;border:4px solid #0c314d;box-shadow:0 0 0 2px #d6f7ff,0 2px 7px #0008}
+.temp-ends{display:flex;justify-content:space-between;font-size:9px;color:#779ab5;direction:ltr;margin-top:3px}
+.transport{min-width:0;display:flex;align-items:center;justify-content:flex-end;gap:7px;flex-wrap:wrap}
+.control-btn.primary{background:linear-gradient(120deg,#136b79,#148c91);border-color:#39c7be;color:#edffff;font-weight:bold}
+.control-btn.warn{border-color:#8c6840;color:#ffd6a9;background:#382b1d}
+.control-btn:disabled{opacity:.35;cursor:not-allowed;filter:grayscale(.4)}
+.speed-set{display:flex;align-items:center;gap:3px;border:1px solid #294b68;border-radius:10px;padding:3px;background:#0a2037}
+.speed-btn{min-height:27px;padding:4px 8px;border:0;background:transparent;font-size:10px;color:#91acc1}
+.speed-btn.selected{background:#1b5570;color:#fff}
+.sound-tools{display:flex;align-items:center;gap:5px;border:1px solid #294b68;background:#0a2037;border-radius:9px;padding:5px 8px;height:34px}
+.sound-tools label{font-size:9px;color:#9fb9cc}
+#volume{width:62px;accent-color:#40d0cd;height:13px}
+.footer-note{font-size:9px;color:#789bb6;white-space:nowrap;width:100%;text-align:left;margin-top:-1px}
+/* SVG apparatus */
+.svg-label{font:14px Tahoma,sans-serif;fill:#d7eafa;paint-order:stroke;stroke:#0a1b2e;stroke-width:4px;stroke-linejoin:round;pointer-events:none}
+.svg-small{font:11px Tahoma,sans-serif;fill:#a8c4d8;paint-order:stroke;stroke:#0a1b2e;stroke-width:3px;stroke-linejoin:round;pointer-events:none}
+.label-layer{transition:opacity .2s}
+.labels-hidden .label-layer{opacity:0;pointer-events:none}
+.molecules-hidden .molecule-layer{opacity:0;pointer-events:none}
+.molecule-layer{transition:opacity .2s}
+.glass{fill:#b8eaff12;stroke:#a7d5e8;stroke-width:4;stroke-linejoin:round}
+.glass-thin{fill:none;stroke:#bdeaff;stroke-width:3;stroke-linecap:round;opacity:.72}
+.water-shell{fill:#349bda17;stroke:#8cc9e9;stroke-width:3}
+.water-flow{fill:none;stroke:#39a9f3;stroke-width:5;stroke-linecap:round;stroke-dasharray:9 13;animation:waterflow 1.15s linear infinite;opacity:.9}
+.steam-flow{fill:none;stroke:#ff9b47;stroke-width:5;stroke-linecap:round;stroke-dasharray:10 13;animation:steamflow .75s linear infinite;opacity:.88}
+@keyframes waterflow{to{stroke-dashoffset:-44}}
+@keyframes steamflow{to{stroke-dashoffset:-46}}
+.bubble{fill:#d8f7ff66;stroke:#c5f7ff;stroke-width:1.3;transform-box:fill-box;transform-origin:center;animation:bubbleRise 2.4s ease-in infinite;opacity:0}
+@keyframes bubbleRise{0%{transform:translateY(0) scale(.5);opacity:0}20%{opacity:.8}90%{opacity:.45}100%{transform:translateY(-50px) scale(1.15);opacity:0}}
+.drop{fill:#a9eaff;stroke:#e2fbff;stroke-width:1;filter:drop-shadow(0 0 4px #5bcfff88);animation:dropFall 1.5s ease-in infinite;opacity:0}
+.condenser-drop{animation-name:dropSlide}
+@keyframes dropSlide{0%{transform:translate(-3px,-2px);opacity:0}25%{opacity:1}100%{transform:translate(12px,8px);opacity:0}}
+@keyframes dropFall{0%{transform:translateY(-4px);opacity:0}25%{opacity:1}85%{opacity:.9}100%{transform:translateY(26px);opacity:0}}
+.glow{filter:drop-shadow(0 0 14px #ff8b392c)}
+.hotspot{cursor:pointer;outline:none}
+.hotspot:focus .focus-ring,.hotspot:hover .focus-ring{stroke:#7ff4ed;stroke-width:3;opacity:1}
+.focus-ring{fill:#ffffff03;stroke:transparent;opacity:0;transition:.2s}
+#thermoMercury{transition:y .12s,height .12s}
+.moleculeParticle{pointer-events:none;filter:drop-shadow(0 2px 2px #0005)}
+.part-highlight{stroke:#55d8d1!important;filter:drop-shadow(0 0 8px #36d9d1aa)}
+/* modal */
+.modal-backdrop{position:fixed;inset:0;background:#020914c9;backdrop-filter:blur(7px);z-index:20;display:none;align-items:center;justify-content:center;padding:18px}
+.modal-backdrop.open{display:flex}
+.modal{width:min(760px,95vw);max-height:min(88dvh,850px);overflow:auto;border:1px solid #39617c;border-radius:18px;background:linear-gradient(150deg,#112d4a,#091b31);box-shadow:0 25px 80px #0009;padding:18px;scrollbar-width:thin;scrollbar-color:#426983 #0b2035}
+.modal-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.modal-head h2{font-size:17px;margin:0;color:#e6f8ff}
+.close-btn{width:32px;height:32px;border-radius:9px;border:1px solid #41617b;background:#17344f;font-size:18px;display:grid;place-items:center}
+.modal-tabs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 14px}
+.modal-tab{border:1px solid #345571;border-radius:9px;background:#0d223a;color:#abc6d9;padding:7px 12px;font-size:11px}
+.modal-tab.active{background:#135365;border-color:#45c9c5;color:#fff}
+.modal-content{font-size:12px;line-height:2;color:#c8dce9}
+.modal-content h3{font-size:13px;color:#e7f8ff;margin:12px 0 5px}
+.modal-content p{margin:6px 0}
+.guide-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.guide-item{border:1px solid #284964;border-radius:10px;background:#0a2037;padding:9px 11px}
+.guide-item b{display:block;color:#6be0d8;font-size:11px;margin-bottom:2px}
+.guide-item span{font-size:10px;color:#b7cddd;line-height:1.75}
+.molecule-comparison{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.mol-card{border:1px solid #31536d;border-radius:13px;background:#0a2037;padding:12px;min-width:0}
+.mol-card h3{margin:0 0 5px;color:#fff;font-size:14px}
+.mol-card .formula{font-size:18px;font-weight:bold;color:#77e5da;direction:ltr;text-align:center;margin:3px 0}
+.mol-card svg{display:block;width:100%;height:108px;overflow:visible}
+.mol-stats{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:8px}
+.mol-stats div{background:#112c47;border-radius:7px;padding:6px;font-size:10px;color:#a9c2d5}
+.mol-stats b{display:block;color:#fff;font-size:12px;margin-top:2px}
+.result-box{border-right:3px solid #3cc8c1;background:#0c263d;padding:10px 12px;border-radius:7px;margin:8px 0}
+.quiz-q{border:1px solid #2d4e69;background:#0a2037;border-radius:11px;padding:12px;margin:10px 0}
+.quiz-q h3{margin:0 0 8px;font-size:12px}
+.quiz-options{display:flex;flex-wrap:wrap;gap:6px}
+.quiz-option{border:1px solid #3a5b74;background:#112d49;border-radius:8px;padding:7px 10px;font-size:11px;color:#d6e7f2}
+.quiz-option.correct{background:#155342;border-color:#4bc99b;color:#ddfff1}
+.quiz-option.wrong{background:#5b2c30;border-color:#e97979;color:#ffe1e1}
+.quiz-feedback{font-size:10px;color:#a9d9ce;min-height:19px;margin-top:7px}
+.notice{border:1px solid #725a39;background:#362b1b;border-radius:9px;padding:9px 11px;color:#ffdfae;font-size:10px;line-height:1.8;margin-top:10px}
+.toast{position:fixed;bottom:calc(var(--footer-h) + 15px);left:50%;transform:translate(-50%,15px);background:#133d52;border:1px solid #3eb9b4;color:#ebffff;padding:9px 14px;border-radius:10px;font-size:11px;opacity:0;pointer-events:none;transition:.25s;z-index:30;box-shadow:0 8px 22px #0005;white-space:nowrap}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+@media(max-width:1100px){.main{grid-template-columns:minmax(0,1fr) 270px;gap:8px;padding:8px}.topbar{padding:0 10px}.brand{min-width:190px}.top-btn{padding:6px 8px;font-size:10px}.bottom-bar{padding-left:10px;padding-right:10px;gap:9px;grid-template-columns:minmax(250px,1fr) minmax(390px,1.2fr)}}
+@media(max-width:820px){
+ :root{--header-h:48px;--footer-h:138px}
+ .topbar{gap:6px;padding:0 8px}.brand{min-width:0;flex:1}.brand-mark{width:27px;height:27px;font-size:16px}.brand-sub{display:none}.brand-title{font-size:11px}.top-actions{gap:4px}.top-btn{min-height:30px;padding:5px 7px;font-size:9px}.top-btn .ico{font-size:13px}
+ .main{display:flex;flex-direction:column;gap:7px;padding:7px}.stage-panel{flex:1 1 64%;min-height:0}.side-panel{flex:0 0 32%;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr auto;gap:7px;overflow:hidden}.stage-card{grid-row:1 / 3}.stage-list{display:grid;grid-template-columns:1fr;gap:2px}.stage-item{font-size:9px;min-height:23px;padding:2px 5px}.explain-card{min-height:0}.explain-card p{font-size:10px;line-height:1.65}.science-note{font-size:8px;line-height:1.5;margin-top:4px;padding:3px 5px}.reading-grid{padding-top:5px}.reading{padding:4px 6px}.part-card{display:none}.fraction-card{padding:8px 10px}.bottom-bar{display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:5px;padding:7px 12px calc(7px + env(safe-area-inset-bottom));height:var(--footer-h);flex-basis:var(--footer-h)}
+ .temp-zone{gap:3px}.author-credit{font-size:8px;text-align:right}.temp-header{justify-content:space-between}.temp-label{font-size:10px}#tempValue{font-size:20px}.slider-wrap{padding:3px 0 13px}.transport{justify-content:center;gap:5px}.control-btn{min-height:29px;padding:5px 8px;font-size:10px}.speed-set{height:29px}.speed-btn{min-height:22px;padding:3px 7px}.sound-tools{height:29px;padding:3px 6px}.footer-note{display:none}
+}
+@media(max-width:560px){
+ :root{--header-h:44px;--footer-h:145px}
+ #apparatus{display:none}#mobileApparatus{display:block;width:100%;height:100%}
+ .topbar{padding:0 6px}.brand-mark{width:24px;height:24px;border-radius:7px}.brand-title{font-size:10px;max-width:135px}.top-actions{gap:3px}.top-btn{width:29px;height:29px;min-height:29px;padding:0;font-size:0;border-radius:8px}.top-btn .ico{font-size:15px}.top-btn .btn-text{display:none}
+ .main{padding:5px;gap:5px}.stage-panel{flex-basis:62%;border-radius:11px}.stage-head{top:7px;right:8px;left:8px}.stage-kicker{font-size:9px}.status-pill{font-size:8px;padding:4px 7px}.side-panel{flex-basis:36%;grid-template-columns:1fr 1fr;grid-template-rows:1fr;gap:5px}.stage-card{grid-row:auto;padding:7px 7px}.info-card h2{font-size:10px;margin-bottom:5px}.stage-item{font-size:8px;min-height:22px;gap:5px;padding:2px 3px}.stage-item .num{width:15px;height:15px;font-size:8px}.explain-card{padding:7px 8px}.explain-card p{font-size:9px;line-height:1.65}.science-note{font-size:7.5px;line-height:1.45;margin-top:3px;padding:2px 4px}.reading-grid{gap:4px}.reading{padding:4px}.reading small{font-size:8px}.reading strong{font-size:12px}.reading em{font-size:8px}.fraction-card{display:none}
+ .bottom-bar{padding:6px 8px calc(6px + env(safe-area-inset-bottom));gap:5px}.temp-label{font-size:9px}.temp-readout small{font-size:9px}#tempValue{font-size:19px}.ref-mark:after{font-size:8px}.transport{gap:4px}.control-btn{min-height:28px;padding:4px 6px;font-size:9px}.control-btn .btn-text{display:none}.control-btn .ico{font-size:14px}.speed-btn{font-size:9px;padding:3px 5px}.sound-tools label{display:none}#volume{width:46px}.sound-tools{padding:3px 5px}
+ .guide-grid,.molecule-comparison{grid-template-columns:1fr}.modal{padding:13px}.modal-head h2{font-size:14px}.modal-content{font-size:11px}.mol-card svg{height:85px}
+}
+@media(max-height:620px) and (min-width:821px){:root{--header-h:46px;--footer-h:94px}.main{padding-top:6px;padding-bottom:6px}.info-card{padding:8px 10px}.stage-item{min-height:21px}.bottom-bar{padding-top:6px;padding-bottom:6px}.brand-mark{width:27px;height:27px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:3s!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">⚗</div>
+      <div style="min-width:0">
+        <div class="brand-title">آزمایشگاه تعاملی علوم | جداسازی اجزای نفت خام</div>
+        <div class="brand-sub">تقطیر ساده • هگزان و نونان • فشار ۱ اتمسفر</div>
+      </div>
+    </div>
+    <nav class="top-actions" aria-label="ابزارهای آزمایش">
+      <button class="top-btn" id="guideBtn" title="راهنمای آزمایش"><span class="ico">ⓘ</span><span class="btn-text">راهنما</span></button>
+      <button class="top-btn active" id="labelsBtn" aria-pressed="true" title="نمایش یا مخفی‌کردن برچسب اجزا"><span class="ico">⌗</span><span class="btn-text">برچسب‌ها</span></button>
+      <button class="top-btn active" id="moleculesBtn" aria-pressed="true" title="نمایش یا مخفی‌کردن مولکول‌ها"><span class="ico">●</span><span class="btn-text">مولکول‌ها</span></button>
+      <button class="top-btn" id="soundBtn" aria-pressed="false" title="فعال‌کردن صدا"><span class="ico">♪</span><span class="btn-text">صدا خاموش</span></button>
+      <button class="top-btn" id="fullscreenBtn" title="تمام‌صفحه"><span class="ico">⛶</span><span class="btn-text">تمام‌صفحه</span></button>
+    </nav>
+  </header>
+
+  <main class="main">
+    <section class="stage-panel" id="stagePanel" aria-label="دستگاه تقطیر">
+      <div class="stage-head">
+        <div class="stage-kicker">نمای شماتیک تعاملی دستگاه تقطیر ساده</div>
+        <div class="status-pill"><b id="statusDot">●</b><span id="statusText">آماده شروع آزمایش</span></div>
+      </div>
+      <svg id="apparatus" viewBox="0 0 1100 620" role="img" aria-label="دستگاه تقطیر ساده شامل بالن، دماسنج، مبرد لیبیگ و ظرف گیرنده">
+        <defs>
+          <linearGradient id="liquidGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#48cbd0" stop-opacity=".7"/><stop offset="1" stop-color="#167da7" stop-opacity=".52"/></linearGradient>
+          <linearGradient id="receiverGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#71e1d8" stop-opacity=".72"/><stop offset="1" stop-color="#2389ae" stop-opacity=".65"/></linearGradient>
+          <linearGradient id="mantleGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f9a34e"/><stop offset="1" stop-color="#9d482d"/></linearGradient>
+          <linearGradient id="thermoGrad" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ed654c"/><stop offset="1" stop-color="#ffb15b"/></linearGradient>
+          <clipPath id="flaskClip"><path d="M145 258 L145 344 C111 369 99 414 111 461 C123 510 163 531 198 517 C239 501 254 456 242 411 C236 382 218 359 191 344 L191 258Z"/></clipPath>
+          <clipPath id="receiverClip"><path d="M880 440 L880 455 L888 519 Q890 530 904 530 L954 530 Q968 530 970 519 L978 455 L978 440Z"/></clipPath>
+          <marker id="arrowSteam" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6Z" fill="#ff9b47"/></marker>
+          <marker id="arrowWater" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6Z" fill="#49b8f4"/></marker>
+          <filter id="softGlow"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        </defs>
+        <!-- subtle workbench -->
+        <path d="M35 548 H1065" stroke="#29455f" stroke-width="2" opacity=".55"/>
+        <path d="M35 554 H1065" stroke="#102940" stroke-width="7" opacity=".7"/>
+        <g opacity=".5" stroke="#31516b" fill="none"><path d="M75 95h920" stroke-dasharray="3 10"/><path d="M75 530h920" stroke-dasharray="3 10"/></g>
+
+        <!-- Retort stand and clamp -->
+        <g class="hotspot" data-part="stand" tabindex="0" role="button" aria-label="پایه و گیره">
+          <rect class="focus-ring" x="35" y="115" width="65" height="445" rx="12"/>
+          <path d="M72 135 V535" stroke="#9fb4c3" stroke-width="8" stroke-linecap="round"/><path d="M42 536 H102" stroke="#9fb4c3" stroke-width="9" stroke-linecap="round"/><path d="M50 543 H93" stroke="#617f94" stroke-width="3"/>
+          <path d="M72 272 H126 M72 272 l26 -10 M72 272 l26 10" stroke="#a8bdcc" stroke-width="5" fill="none" stroke-linecap="round"/>
+          <circle cx="72" cy="272" r="8" fill="#536d80" stroke="#c1d3df" stroke-width="2"/>
+          <path d="M120 258 Q133 246 146 258" stroke="#b5c8d7" stroke-width="5" fill="none"/>
+        </g>
+
+        <!-- Electric heating mantle -->
+        <g class="hotspot" data-part="heater" tabindex="0" role="button" aria-label="منتل برقی">
+          <path class="focus-ring" d="M91 426 Q82 510 157 541 Q223 550 263 491 L252 420Z"/>
+          <path d="M101 444 Q91 500 145 529 Q198 547 240 500 Q257 478 246 437Z" fill="url(#mantleGrad)" stroke="#f0a364" stroke-width="3" class="glow"/>
+          <path d="M116 466 Q169 495 232 462 M119 484 Q171 514 231 482 M132 505 Q173 525 213 504" fill="none" stroke="#ffcc83" stroke-width="3" opacity=".75"/>
+          <path d="M147 536 H211" stroke="#819daf" stroke-width="6" stroke-linecap="round"/>
+          <circle cx="226" cy="515" r="5" fill="#ffd78a" stroke="#6e342c" stroke-width="2"/>
+        </g>
+
+        <!-- Flask liquid and flask glass -->
+        <g class="hotspot" data-part="flask" tabindex="0" role="button" aria-label="بالن ته‌گرد حاوی مخلوط">
+          <path class="focus-ring" d="M130 245 H207 V347 Q272 399 248 470 Q231 536 173 532 Q108 530 98 465 Q87 395 139 348Z"/>
+          <g clip-path="url(#flaskClip)">
+            <rect id="flaskLiquid" x="98" y="421" width="165" height="125" fill="url(#liquidGrad)"/>
+            <path id="flaskSurface" d="M100 420 Q130 412 160 420 T220 420 T260 420" stroke="#9af6ed" stroke-width="2" fill="none" opacity=".8"/>
+            <g id="bubbles">
+              <circle class="bubble" cx="137" cy="439" r="4" style="animation-delay:.1s"/><circle class="bubble" cx="178" cy="445" r="3" style="animation-delay:.8s"/><circle class="bubble" cx="210" cy="433" r="5" style="animation-delay:1.4s"/><circle class="bubble" cx="157" cy="458" r="3.5" style="animation-delay:.5s"/><circle class="bubble" cx="196" cy="465" r="3" style="animation-delay:1.1s"/><circle class="bubble" cx="124" cy="464" r="2.5" style="animation-delay:1.7s"/><circle class="bubble" cx="224" cy="456" r="3.5" style="animation-delay:.3s"/><circle class="bubble" cx="166" cy="432" r="2.5" style="animation-delay:1.9s"/>
+            </g>
+          </g>
+          <path d="M145 258 L145 344 C111 369 99 414 111 461 C123 510 163 531 198 517 C239 501 254 456 242 411 C236 382 218 359 191 344 L191 258Z" class="glass"/>
+          <path d="M151 270 V345 M201 270 V345" class="glass-thin" opacity=".65"/>
+          <path d="M127 391 Q113 427 126 459" stroke="#e2f7ff" stroke-width="3" opacity=".4" fill="none"/>
+          <path d="M145 258 H191 V344" stroke="#c4eafa" stroke-width="4" fill="none"/>
+        </g>
+
+        <!-- Still head / delivery tube -->
+        <g class="hotspot" data-part="stillhead" tabindex="0" role="button" aria-label="رابط و سر تقطیر">
+          <rect class="focus-ring" x="174" y="180" width="270" height="105" rx="22"/>
+          <path d="M169 259 V221 Q169 205 188 205 H424" fill="none" stroke="#9bd9ec" stroke-width="17" stroke-linejoin="round" opacity=".18"/>
+          <path d="M169 259 V221 Q169 205 188 205 H424" class="glass-thin" stroke-width="4"/>
+          <path d="M176 254 V222 Q176 214 190 214 H420" fill="none" stroke="#f0fbff" stroke-width="2" opacity=".5"/>
+          <path d="M228 205 H400" class="steam-flow" marker-end="url(#arrowSteam)"/>
+        </g>
+
+        <!-- Thermometer: bulb in vapor path -->
+        <g class="hotspot" data-part="thermometer" tabindex="0" role="button" aria-label="دماسنج">
+          <rect class="focus-ring" x="292" y="92" width="75" height="177" rx="12"/>
+          <rect x="321" y="105" width="13" height="105" rx="7" fill="#d9f3fc" fill-opacity=".18" stroke="#c0e3ef" stroke-width="2"/>
+          <rect id="thermoMercury" x="325" y="195" width="5" height="15" rx="2.5" fill="url(#thermoGrad)"/>
+          <circle id="thermoBulb" cx="327.5" cy="205" r="8" fill="#ff8054" stroke="#ffd0a4" stroke-width="2"/>
+          <path d="M327 115 V190" stroke="#e7fbff" stroke-width="2" opacity=".7"/>
+          <g stroke="#b6d6e5" stroke-width="1.5"><path d="M335 126h8 M335 147h6 M335 168h8 M335 189h6"/></g>
+          <rect x="291" y="82" width="72" height="20" rx="6" fill="#0b2138" stroke="#4b6d84"/>
+          <text id="svgTempText" x="327" y="96" text-anchor="middle" font-size="11" font-family="Tahoma" fill="#fff">20.0°C</text>
+        </g>
+
+        <!-- Liebig condenser jacket and inner tube -->
+        <g class="hotspot" data-part="condenser" tabindex="0" role="button" aria-label="مبرد لیبیگ">
+          <rect class="focus-ring" x="394" y="143" width="431" height="321" rx="42" transform="rotate(28 610 300)"/>
+          <path d="M421 205 L780 405" stroke="#7ac3e5" stroke-width="58" stroke-linecap="round" opacity=".17" fill="none"/>
+          <path d="M421 205 L780 405" stroke="#a6d8ed" stroke-width="3" stroke-linecap="round" opacity=".9" fill="none"/>
+          <path d="M421 205 L780 405" stroke="#d9f4ff" stroke-width="2" stroke-linecap="round" opacity=".55" fill="none"/>
+          <path d="M421 205 L780 405" stroke="#8ad9f4" stroke-width="11" stroke-linecap="round" opacity=".2" fill="none"/>
+          <path d="M421 205 L780 405" stroke="#c7f1ff" stroke-width="4" stroke-linecap="round" opacity=".85" fill="none"/>
+          <path d="M770 400 L436 215" class="water-flow" marker-end="url(#arrowWater)" opacity=".65"/>
+          <path d="M440 216 L752 389" class="steam-flow" stroke-width="2.5" marker-end="url(#arrowSteam)" opacity=".65"/>
+          <!-- coolant inlet at lower end, outlet at upper end -->
+          <path d="M769 399 L790 440 L822 458" fill="none" stroke="#8acde9" stroke-width="12" stroke-linecap="round" opacity=".35"/>
+          <path d="M769 399 L790 440 L822 458" fill="none" stroke="#c1eafb" stroke-width="3" stroke-linecap="round"/>
+          <path d="M844 458 L822 458" stroke="#45b5f2" stroke-width="5" marker-end="url(#arrowWater)"/>
+          <path d="M433 212 L407 172 L383 159" fill="none" stroke="#8acde9" stroke-width="12" stroke-linecap="round" opacity=".35"/>
+          <path d="M433 212 L407 172 L383 159" fill="none" stroke="#c1eafb" stroke-width="3" stroke-linecap="round"/>
+          <path d="M383 159 L360 159" stroke="#45b5f2" stroke-width="5" marker-end="url(#arrowWater)"/>
+          <text x="824" y="474" class="svg-small">ورود آب سرد</text>
+          <text x="357" y="145" class="svg-small">خروج آب گرم‌تر</text>
+          <path d="M421 205 L780 405" fill="none" stroke="#effaff" stroke-width="1.5" opacity=".6"/>
+        </g>
+
+        <!-- Water drops and condensate -->
+        <g id="condensateDrops">
+          <circle class="drop condenser-drop" cx="724" cy="370" r="4" style="animation-delay:.2s"/><circle class="drop condenser-drop" cx="750" cy="385" r="3.5" style="animation-delay:.8s"/><circle class="drop condenser-drop" cx="773" cy="398" r="4" style="animation-delay:1.1s"/>
+        </g>
+
+        <!-- Delivery adapter -->
+        <g class="hotspot" data-part="adapter" tabindex="0" role="button" aria-label="رابط خروجی">
+          <rect class="focus-ring" x="768" y="380" width="125" height="113" rx="18"/>
+          <path d="M780 405 L825 430 Q846 442 870 445 L891 445" stroke="#9bd9ec" stroke-width="17" opacity=".17" fill="none" stroke-linecap="round"/>
+          <path d="M780 405 L825 430 Q846 442 870 445 L891 445" class="glass-thin" stroke-width="4"/>
+          <path d="M792 413 L832 436 Q853 448 886 448" fill="none" stroke="#effbff" stroke-width="2" opacity=".55"/>
+        </g>
+
+        <!-- Receiver vessel -->
+        <g class="hotspot" data-part="receiver" tabindex="0" role="button" aria-label="ظرف گیرنده">
+          <rect class="focus-ring" x="866" y="420" width="130" height="135" rx="15"/>
+          <g clip-path="url(#receiverClip)">
+            <rect id="receiverLiquid" x="881" y="516" width="100" height="16" fill="url(#receiverGrad)"/>
+            <path id="receiverSurface" d="M881 516 Q903 512 926 516 T978 516" stroke="#b4fff4" stroke-width="2" fill="none"/>
+          </g>
+          <path d="M880 440 L880 455 L888 519 Q890 530 904 530 L954 530 Q968 530 970 519 L978 455 L978 440" fill="#bfefff08" stroke="#b8e2f1" stroke-width="3" stroke-linejoin="round"/>
+          <path d="M886 450 H972 M892 462 L899 516" stroke="#e6f8ff" stroke-width="2" opacity=".5" fill="none"/>
+          <path id="fallingDrop" class="drop" cx="914" cy="458" r="4"/>
+          <text id="receiverLabel" x="929" y="550" text-anchor="middle" class="svg-small">بخش اول</text>
+        </g>
+
+        <!-- Condenser support stand and clamp -->
+        <g class="hotspot" data-part="stand" tabindex="0" role="button" aria-label="پایه و گیره مبرد">
+          <path d="M627 342 V535 M588 536 H666" stroke="#9fb4c3" stroke-width="7" stroke-linecap="round"/>
+          <path d="M609 350 L646 370 M646 350 L609 370" stroke="#b9cad5" stroke-width="5" stroke-linecap="round"/>
+          <circle cx="627" cy="359" r="7" fill="#546f82" stroke="#c8dae5" stroke-width="2"/>
+          <path d="M606 350 L647 373" stroke="#b4c7d4" stroke-width="4"/>
+        </g>
+
+        <!-- Burner/heat indicator, no flame -->
+        <g id="heatGlow" opacity="0">
+          <ellipse cx="173" cy="472" rx="85" ry="58" fill="#ff8b42" opacity=".12" filter="url(#softGlow)"/>
+          <path d="M118 487 Q130 472 141 486 T164 486 T187 486 T210 486 T231 486" stroke="#ffca78" stroke-width="3" fill="none" opacity=".6"/>
+        </g>
+
+        <!-- Moving ball-and-stick particles -->
+        <g id="moleculeLayer" class="molecule-layer"></g>
+
+        <!-- Editable labels -->
+        <g class="label-layer" id="labelLayer">
+          <text x="82" y="574" class="svg-label">منتل برقی</text>
+          <text x="118" y="367" class="svg-label">بالن ته‌گرد</text>
+          <text x="232" y="183" class="svg-label">سر تقطیر</text>
+          <text x="345" y="112" class="svg-label">دماسنج</text>
+          <text x="581" y="150" class="svg-label">مبرد لیبیگ</text>
+          <text x="887" y="414" class="svg-label">ظرف گیرنده</text>
+          <text x="526" y="486" class="svg-small">مسیر بخار در لوله داخلی</text>
+          <text x="548" y="510" class="svg-small">آب خنک‌کننده در جداره بیرونی</text>
+          <path d="M545 478 L602 340" stroke="#7da4bc" stroke-width="1.5" stroke-dasharray="3 4" fill="none"/>
+        </g>
+
+        <!-- flow key -->
+        <g transform="translate(820 75)">
+          <path d="M0 0 h42" stroke="#ff9b47" stroke-width="4" marker-end="url(#arrowSteam)"/><text x="52" y="4" class="svg-small">بخار و مایع تقطیرشده</text>
+          <path d="M0 25 h42" stroke="#49b8f4" stroke-width="4" marker-end="url(#arrowWater)"/><text x="52" y="29" class="svg-small">آب خنک‌کننده</text>
+        </g>
+      </svg>
+      <svg id="mobileApparatus" viewBox="0 0 420 420" role="img" aria-label="نمای عمودی دستگاه تقطیر ساده برای تلفن همراه">
+        <defs>
+          <linearGradient id="mLiquidGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#48cbd0" stop-opacity=".72"/><stop offset="1" stop-color="#167da7" stop-opacity=".56"/></linearGradient>
+          <linearGradient id="mReceiverGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#71e1d8" stop-opacity=".72"/><stop offset="1" stop-color="#2389ae" stop-opacity=".65"/></linearGradient>
+          <linearGradient id="mMantleGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f9a34e"/><stop offset="1" stop-color="#9d482d"/></linearGradient>
+          <clipPath id="mFlaskClip"><path d="M58 245 L58 270 C28 292 27 333 44 356 C62 381 103 379 119 353 C133 330 128 298 100 270 L100 245Z"/></clipPath>
+          <clipPath id="mReceiverClip"><path d="M345 310 L345 320 L352 375 Q353 384 362 384 H382 Q391 384 392 375 L399 320 L399 310Z"/></clipPath>
+          <marker id="mArrowSteam" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6Z" fill="#ff9b47"/></marker>
+          <marker id="mArrowWater" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6Z" fill="#49b8f4"/></marker>
+        </defs>
+        <path d="M10 395 H410" stroke="#29455f" stroke-width="2" opacity=".65"/>
+        <!-- Stand and heater -->
+        <g class="hotspot" data-part="stand" tabindex="0" role="button" aria-label="پایه و گیره آزمایشگاهی">
+          <rect class="focus-ring" x="9" y="116" width="42" height="285" rx="8"/>
+          <path d="M28 120 V391 M10 392 H48" stroke="#9fb4c3" stroke-width="6" stroke-linecap="round"/>
+          <path d="M28 268 H57 M28 268 l17 -8 M28 268 l17 8" stroke="#b5c8d7" stroke-width="4" fill="none" stroke-linecap="round"/>
+          <circle cx="28" cy="268" r="6" fill="#536d80" stroke="#c1d3df" stroke-width="2"/>
+        </g>
+        <g class="hotspot" data-part="heater" tabindex="0" role="button" aria-label="منتل برقی">
+          <path class="focus-ring" d="M28 325 Q18 375 65 390 Q111 395 133 353 L125 323Z"/>
+          <path d="M31 333 Q20 371 63 388 Q104 393 128 355 L121 330Z" fill="url(#mMantleGrad)" stroke="#f0a364" stroke-width="2.5"/>
+          <path d="M43 348 Q80 365 116 346 M47 365 Q81 380 111 364" stroke="#ffcc83" stroke-width="2.5" fill="none" opacity=".8"/>
+          <path d="M56 391 H104" stroke="#819daf" stroke-width="5" stroke-linecap="round"/>
+        </g>
+        <!-- Round-bottom flask -->
+        <g class="hotspot" data-part="flask" tabindex="0" role="button" aria-label="بالن ته‌گرد">
+          <path class="focus-ring" d="M51 237 H108 V271 Q153 319 123 361 Q103 391 67 381 Q23 372 31 326 Q34 295 58 270Z"/>
+          <g clip-path="url(#mFlaskClip)">
+            <rect id="mFlaskLiquid" x="24" y="318" width="120" height="100" fill="url(#mLiquidGrad)"/>
+            <path id="mFlaskSurface" d="M25 318 Q49 312 72 318 T120 318 T145 318" stroke="#9af6ed" stroke-width="2" fill="none"/>
+            <g id="mBubbles"><circle class="bubble" cx="52" cy="338" r="3.4" style="animation-delay:.1s"/><circle class="bubble" cx="79" cy="347" r="3" style="animation-delay:.8s"/><circle class="bubble" cx="106" cy="335" r="4" style="animation-delay:1.4s"/><circle class="bubble" cx="66" cy="358" r="2.8" style="animation-delay:.5s"/><circle class="bubble" cx="94" cy="365" r="3" style="animation-delay:1.1s"/></g>
+          </g>
+          <path d="M58 245 L58 270 C28 292 27 333 44 356 C62 381 103 379 119 353 C133 330 128 298 100 270 L100 245Z" class="glass"/>
+          <path d="M64 252 V271 M105 252 V271 M47 310 Q39 334 51 354" class="glass-thin"/>
+        </g>
+        <!-- Still head -->
+        <g class="hotspot" data-part="stillhead" tabindex="0" role="button" aria-label="رابط و سر تقطیر">
+          <rect class="focus-ring" x="69" y="192" width="151" height="68" rx="13"/>
+          <path d="M79 245 V216 Q79 206 91 206 H210" fill="none" stroke="#9bd9ec" stroke-width="14" opacity=".2"/>
+          <path d="M79 245 V216 Q79 206 91 206 H210" class="glass-thin" stroke-width="3.5"/>
+          <path d="M104 206 H202" class="steam-flow" marker-end="url(#mArrowSteam)"/>
+        </g>
+        <!-- Thermometer bulb precisely in the vapor path -->
+        <g class="hotspot" data-part="thermometer" tabindex="0" role="button" aria-label="دماسنج">
+          <rect class="focus-ring" x="147" y="89" width="49" height="135" rx="9"/>
+          <rect x="166" y="108" width="11" height="101" rx="6" fill="#d9f3fc" fill-opacity=".2" stroke="#c0e3ef" stroke-width="1.7"/>
+          <rect id="mThermoMercury" x="169" y="195" width="5" height="12" rx="2.5" fill="url(#thermoGrad)"/>
+          <circle id="mThermoBulb" cx="171.5" cy="207" r="7.5" fill="#ff8054" stroke="#ffd0a4" stroke-width="1.5"/>
+          <path d="M171 117 V188" stroke="#e7fbff" stroke-width="1.5" opacity=".7"/>
+          <rect x="144" y="83" width="56" height="18" rx="5" fill="#0b2138" stroke="#4b6d84"/>
+          <text id="mSvgTempText" x="172" y="96" text-anchor="middle" font-size="10" font-family="Tahoma" fill="#fff">20.0°C</text>
+        </g>
+        <!-- Liebig condenser; water jacket outside, vapor tube inside -->
+        <g class="hotspot" data-part="condenser" tabindex="0" role="button" aria-label="مبرد لیبیگ">
+          <rect class="focus-ring" x="191" y="185" width="162" height="133" rx="20" transform="rotate(30 272 250)"/>
+          <path d="M208 212 L327 286" stroke="#7ac3e5" stroke-width="39" stroke-linecap="round" opacity=".18" fill="none"/>
+          <path d="M208 212 L327 286" stroke="#a6d8ed" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+          <path d="M208 212 L327 286" stroke="#c7f1ff" stroke-width="5" stroke-linecap="round" opacity=".86" fill="none"/>
+          <path d="M326 285 L209 213" class="water-flow" marker-end="url(#mArrowWater)" stroke-width="4"/>
+          <path d="M211 214 L326 286" class="steam-flow" marker-end="url(#mArrowSteam)" stroke-width="2.5"/>
+          <path d="M208 212 L192 178 L164 178" fill="none" stroke="#8acde9" stroke-width="9" stroke-linecap="round" opacity=".35"/>
+          <path d="M208 212 L192 178 L164 178" fill="none" stroke="#c1eafb" stroke-width="2.5"/>
+          <path d="M164 178 L146 178" stroke="#45b5f2" stroke-width="4" marker-end="url(#mArrowWater)"/>
+          <path d="M327 286 L350 313 L380 313" fill="none" stroke="#8acde9" stroke-width="9" stroke-linecap="round" opacity=".35"/>
+          <path d="M327 286 L350 313 L380 313" fill="none" stroke="#c1eafb" stroke-width="2.5"/>
+          <path d="M380 313 L354 313" stroke="#45b5f2" stroke-width="4" marker-end="url(#mArrowWater)"/>
+        </g>
+        <g id="mCondensateDrops"><circle class="drop condenser-drop" cx="297" cy="267" r="3.2" style="animation-delay:.2s"/><circle class="drop condenser-drop" cx="315" cy="279" r="3" style="animation-delay:.8s"/></g>
+        <!-- Adapter and receiver -->
+        <g class="hotspot" data-part="adapter" tabindex="0" role="button" aria-label="رابط خروجی">
+          <rect class="focus-ring" x="319" y="275" width="58" height="55" rx="10"/>
+          <path d="M327 286 Q341 298 352 312 L359 312" stroke="#9bd9ec" stroke-width="12" opacity=".18" fill="none" stroke-linecap="round"/>
+          <path d="M327 286 Q341 298 352 312 L359 312" class="glass-thin" stroke-width="3.2"/>
+        </g>
+        <g class="hotspot" data-part="receiver" tabindex="0" role="button" aria-label="ظرف گیرنده">
+          <rect class="focus-ring" x="337" y="302" width="75" height="91" rx="9"/>
+          <g clip-path="url(#mReceiverClip)"><rect id="mReceiverLiquid" x="345" y="376" width="60" height="12" fill="url(#mReceiverGrad)"/><path id="mReceiverSurface" d="M345 376 Q366 372 399 376" stroke="#b4fff4" stroke-width="1.5" fill="none"/></g>
+          <path d="M345 310 L345 320 L352 375 Q353 384 362 384 H382 Q391 384 392 375 L399 320 L399 310" fill="#bfefff08" stroke="#b8e2f1" stroke-width="2.5" stroke-linejoin="round"/>
+          <path d="M350 318 H394 M356 328 L360 369" stroke="#e6f8ff" stroke-width="1.5" opacity=".5" fill="none"/>
+          <circle id="mFallingDrop" class="drop" cx="366" cy="327" r="3.2"/>
+          <text id="mReceiverLabel" x="370" y="405" text-anchor="middle" class="svg-small">بخش اول</text>
+        </g>
+        <g class="hotspot" data-part="stand" tabindex="0" role="button" aria-label="پایه و گیره مبرد">
+          <path d="M269 274 V391 M249 392 H289" stroke="#9fb4c3" stroke-width="5" stroke-linecap="round"/><path d="M253 278 L285 296 M285 278 L253 296" stroke="#b9cad5" stroke-width="4" stroke-linecap="round"/><circle cx="269" cy="287" r="5" fill="#546f82" stroke="#c8dae5" stroke-width="1.5"/>
+        </g>
+        <g id="mHeatGlow" opacity="0"><ellipse cx="80" cy="347" rx="63" ry="43" fill="#ff8b42" opacity=".14"/></g>
+        <g id="mobileMoleculeLayer" class="molecule-layer"></g>
+        <g class="mobile-label-layer label-layer">
+          <text x="88" y="229" class="svg-label" style="font-size:11px">بالن ته‌گرد</text>
+          <text x="25" y="411" class="svg-label" style="font-size:11px">منتل برقی</text>
+          <text x="146" y="73" class="svg-label" style="font-size:11px">دماسنج</text>
+          <text x="256" y="195" class="svg-label" style="font-size:11px">مبرد لیبیگ</text>
+          <text x="365" y="407" text-anchor="middle" class="svg-label" style="font-size:10px">ظرف گیرنده</text>
+          <text x="130" y="158" class="svg-small" style="font-size:9px">خروج آب گرم‌تر</text>
+          <text x="327" y="296" class="svg-small" style="font-size:9px">ورود آب سرد</text>
+        </g>
+      </svg>
+    </section>
+
+    <aside class="side-panel" aria-label="وضعیت و راهنمای مراحل آزمایش">
+      <section class="info-card stage-card">
+        <h2><span class="dot"></span>مراحل آزمایش</h2>
+        <div class="stage-list" id="stageList">
+          <div class="stage-item active" data-stage="0"><span class="num">۱</span><span>گرم‌شدن</span></div>
+          <div class="stage-item" data-stage="1"><span class="num">۲</span><span>تبخیر و انتقال بخار</span></div>
+          <div class="stage-item" data-stage="2"><span class="num">۳</span><span>چگالش و جمع‌آوری</span></div>
+          <div class="stage-item" data-stage="3"><span class="num">۴</span><span>غنی‌شدن از جزء دوم</span></div>
+          <div class="stage-item" data-stage="4"><span class="num">۵</span><span>تقطیر بخش دوم</span></div>
+        </div>
+      </section>
+      <section class="info-card explain-card">
+        <h2><span class="dot"></span>چه اتفاقی در حال رخ‌دادن است؟</h2>
+        <p id="stageExplanation">با دریافت گرما، جنب‌وجوش مولکول‌های هر دو ماده بیشتر می‌شود. هنوز تبخیر چشمگیری رخ نداده است.</p>
+        <div class="science-note">نقاط جوش 68.7 و 150.8°C مربوط به مواد خالص در فشار 1 atm هستند؛ دمای جوش و ترکیب بخار مخلوط به نسبت اجزا و فشار وابسته است.</div>
+        <div class="reading-grid">
+          <div class="reading"><small>دمای انتخاب‌شده</small><strong id="sideTemp">20.0</strong><em>°C</em></div>
+          <div class="reading"><small>شدت جوشش</small><strong id="boilRead">۰</strong><em>از ۱۰۰</em></div>
+        </div>
+      </section>
+      <section class="info-card part-card">
+        <h2><span class="dot"></span>شناخت اجزای دستگاه</h2>
+        <p><span class="part-name" id="partName">برای مشاهده توضیح، روی یکی از اجزای دستگاه بزنید.</span><span id="partText">بالن، دماسنج، مبرد و ظرف گیرنده هرکدام نقش مشخصی در جداسازی دارند.</span></p>
+      </section>
+      <section class="info-card fraction-card">
+        <h2><span class="dot"></span>مایع جمع‌آوری‌شده</h2>
+        <div class="fraction-row"><span>بخش اول؛ هگزان‌غنی</span><strong><span id="fraction1Amount">0</span> ml</strong></div>
+        <div class="meter"><span id="fraction1Meter"></span></div>
+        <div class="fraction-row"><span>بخش دوم؛ نونان‌غنی</span><strong><span id="fraction2Amount">0</span> ml</strong></div>
+        <div class="meter"><span id="fraction2Meter"></span></div>
+        <div class="fraction-row" style="margin-top:7px"><span>مایع باقی‌مانده در بالن</span><strong id="residualLabel">غنی از هر دو جزء</strong></div>
+      </section>
+    </aside>
+  </main>
+
+  <footer class="bottom-bar">
+    <section class="temp-zone" aria-label="تنظیم دما">
+      <div class="temp-header"><span class="temp-label">تنظیم دمای هیتر</span><div class="temp-readout"><strong id="tempValue">20.0</strong><small>درجه سانتی‌گراد</small></div></div>
+      <div class="slider-wrap">
+        <div class="temp-gradient">
+          <span class="ref-mark" style="left:32.4667%" data-label="68.7° هگزان"></span>
+          <span class="ref-mark" style="left:87.2%" data-label="150.8° نونان"></span>
+        </div>
+        <input id="tempSlider" type="range" min="20" max="170" step="0.1" value="20" aria-label="دمای آزمایش از ۲۰ تا ۱۷۰ درجه سانتی‌گراد">
+        <div class="temp-ends"><span>20°C • سرد</span><span>170°C • گرم</span></div>
+      </div>
+      <div class="author-credit">لیلا سلیمان‌زاده - دبیر علوم تجربی</div>
+    </section>
+    <section class="transport" aria-label="کنترل اجرای آزمایش">
+      <button class="control-btn primary" id="autoBtn" title="گرم‌کردن خودکار"><span class="ico">▶</span><span class="btn-text">شروع خودکار</span></button>
+      <button class="control-btn" id="pauseBtn" title="مکث"><span class="ico">Ⅱ</span><span class="btn-text">مکث</span></button>
+      <button class="control-btn" id="continueBtn" title="ادامه"><span class="ico">▷</span><span class="btn-text">ادامه</span></button>
+      <button class="control-btn" id="stepBtn" title="رفتن به مرحله بعد"><span class="ico">⏭</span><span class="btn-text">گام بعد</span></button>
+      <div class="speed-set" aria-label="سرعت انیمیشن">
+        <button class="speed-btn" data-speed="0.5">0.5x</button><button class="speed-btn selected" data-speed="1">1x</button><button class="speed-btn" data-speed="0.2">0.2x</button>
+      </div>
+      <button class="control-btn warn" id="swapBtn" disabled title="تعویض ظرف گیرنده"><span class="ico">⇄</span><span class="btn-text">تعویض ظرف</span></button>
+      <button class="control-btn" id="resetBtn" title="بازنشانی کامل"><span class="ico">↺</span><span class="btn-text">بازنشانی</span></button>
+      <div class="sound-tools"><label for="volume">شدت صدا</label><input id="volume" type="range" min="0" max="100" value="28" aria-label="شدت صدا"></div>
+    </section>
+  </footer>
+</div>
+
+<div class="modal-backdrop" id="modalBackdrop" role="presentation">
+  <section class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-head"><h2 id="modalTitle">راهنمای آزمایش</h2><button class="close-btn" id="closeModal" aria-label="بستن">×</button></div>
+    <div class="modal-tabs" id="modalTabs">
+      <button class="modal-tab active" data-tab="guide">راهنما و اجزا</button>
+      <button class="modal-tab" data-tab="molecules">مقایسه مولکول‌ها</button>
+      <button class="modal-tab" data-tab="result">نتیجه آزمایش</button>
+      <button class="modal-tab" data-tab="quiz">آزمون کوتاه</button>
+    </div>
+    <div class="modal-content" id="modalContent"></div>
+  </section>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+'use strict';
+const $ = (id) => document.getElementById(id);
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const smooth = (a,b,x) => { const t=clamp((x-a)/(b-a),0,1); return t*t*(3-2*t); };
+const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const state = {
+  temp:20, runMode:'off', autoStarted:false, speed:1, showLabels:true, showMolecules:true,
+  sound:false, volume:.28, receiver:1, collected1:0, collected2:0, stage:0,
+  stepIndex:0, lastDrop:0, audio:null, gain:null, lastBubbleSound:0, lastDripSound:0,
+  toastTimer:0, lastFrame:0, accumulated:0, firstPartReady:false
+};
+const stageDescriptions = [
+ 'با دریافت گرما، جنب‌وجوش مولکول‌های هر دو ماده بیشتر می‌شود. هنوز تبخیر چشمگیری رخ نداده است.',
+ 'هگزان فرّارتر است؛ نزدیک محدوده جوش آن، بخشی از هگزان و مقداری نونان وارد بخار می‌شوند. بخار از هگزان غنی‌تر است.',
+ 'بخار در لوله داخلی مبرد گرما از دست می‌دهد و به قطره‌های مایع تبدیل می‌شود. این مایع در ظرف گیرنده جمع می‌شود.',
+ 'با خروج تدریجی بخش هگزان‌غنی، مایع داخل بالن نسبتاً از نونان غنی‌تر می‌شود؛ دمای لازم برای تبخیر بیشتر می‌شود.',
+ 'پس از تعویض ظرف، با نزدیک‌شدن دما به نقطه جوش خالص نونان، بخار نونان‌غنی‌تری تشکیل و در ظرف دوم جمع می‌شود.'
+];
+const parts = {
+  stand:['پایه و گیره آزمایشگاهی','پایه و گیره‌ها دستگاه را ثابت نگه می‌دارند تا بالن و مبرد در جای مناسب و ایمن قرار بگیرند.'],
+  heater:['منتل یا گرم‌کن برقی','گرما را به‌آرامی و بدون شعله مستقیم به بالن منتقل می‌کند. در این مدل، شدت گرما با دمای انتخابی تغییر می‌کند.'],
+  flask:['بالن ته‌گرد','مخلوط آموزشی n-هگزان و n-نونان در بالن قرار دارد. گرم‌شدن مایع باعث افزایش تبخیر اجزای فرّار می‌شود.'],
+  stillhead:['رابط و سر تقطیر','بخار را از دهانه بالن به سمت مبرد هدایت می‌کند و محل قرارگیری دماسنج را فراهم می‌سازد.'],
+  thermometer:['دماسنج','حباب دماسنج در مسیر بخار و نزدیک ورودی مبرد قرار می‌گیرد؛ بنابراین دمای بخار خروجی را نشان می‌دهد، نه دمای مایع داخل بالن را.'],
+  condenser:['مبرد لیبیگ','بخار در لوله داخلی حرکت می‌کند. آب خنک‌کننده در فضای جداره بیرونی و خلاف جهت بخار جریان دارد و با گرفتن گرما، بخار را چگالیده می‌کند.'],
+  adapter:['رابط خروجی','مایع چگالیده‌شده را از انتهای مبرد به ظرف گیرنده می‌رساند.'],
+  receiver:['ظرف گیرنده','مایع تقطیرشده را جمع می‌کند. برای جمع‌آوری بخش دوم، ظرف اول را با ظرف تمیز دیگری جایگزین می‌کنیم؛ دو مایع به شکل دو لایه نمایش داده نمی‌شوند.']
+};
+
+// Ball-and-stick alkane generator: constructs exactly CnH(2n+2) atoms and all bonds.
+function moleculeMarkup(n, scale=1, withTag=true) {
+  const coords=[];
+  for(let i=0;i<n;i++) coords.push({x: i*17, y: (i%2===0?4:-4)});
+  const hydrogens=[]; const bonds=[];
+  for(let i=0;i<n;i++){
+    const c=coords[i];
+    if(i<n-1){const d=coords[i+1];bonds.push([c.x,c.y,d.x,d.y]);}
+    const positions=[];
+    if(i===0){positions.push([c.x-9,c.y-10],[c.x-9,c.y+10],[c.x+1,c.y-15]);}
+    else if(i===n-1){positions.push([c.x+9,c.y-10],[c.x+9,c.y+10],[c.x-1,c.y+15]);}
+    else {positions.push([c.x,c.y-13],[c.x,c.y+13]);}
+    positions.forEach(([x,y])=>{hydrogens.push({x,y});bonds.push([c.x,c.y,x,y]);});
+  }
+  const width=(n-1)*17+25, height=42;
+  const hex=n===6, accent=hex?'#42d6d0':'#ffad62', label=hex?'هگزان':'نونان';
+  let s=`<g transform="scale(${scale})" class="generated-mol">`;
+  for(const b of bonds) s+=`<line x1="${b[0]}" y1="${b[1]}" x2="${b[2]}" y2="${b[3]}" stroke="#b5c8d8" stroke-width="2.2" stroke-linecap="round"/>`;
+  for(const h of hydrogens) s+=`<circle cx="${h.x}" cy="${h.y}" r="3.1" fill="#eaf6ff" stroke="#8099ad" stroke-width=".9"/>`;
+  for(const c of coords) s+=`<circle cx="${c.x}" cy="${c.y}" r="4.4" fill="#27394c" stroke="#c4d6e3" stroke-width="1.1"/>`;
+  if(withTag) s+=`<rect x="${width+1}" y="-8" width="54" height="18" rx="7" fill="${accent}" fill-opacity=".18" stroke="${accent}" stroke-opacity=".8"/><text x="${width+28}" y="4" text-anchor="middle" font-size="9" font-family="Tahoma" fill="${accent}">${hex?'C₆H₁₄':'C₉H₂₀'}</text>`;
+  s+='</g>';
+  return {markup:s,width:(width+60)*scale,height:height*scale,rawWidth:width+60,rawHeight:height,accent};
+}
+function comparisonSvg(n){
+  const mol=moleculeMarkup(n,1.35,false); const x=18, y=47;
+  return `<svg viewBox="0 0 ${mol.rawWidth*1.35+30} 105" role="img" aria-label="مدل توپ و میله ${n===6?'هگزان':'نونان'}"><g transform="translate(${x} ${y})">${moleculeMarkup(n,1.35,false).markup}</g></svg>`;
+}
+
+// A small illustrative sample of intact molecules; every particle is a whole ball-and-stick group.
+const particleDefs = [
+ {kind:6,home:[132,458],size:.44,phase:'liquid',t:0},{kind:6,home:[180,477],size:.40,phase:'liquid',t:0},{kind:6,home:[208,454],size:.40,phase:'liquid',t:0},
+ {kind:9,home:[146,493],size:.32,phase:'liquid',t:0},{kind:9,home:[190,499],size:.30,phase:'liquid',t:0},{kind:9,home:[216,480],size:.29,phase:'liquid',t:0},
+ {kind:6,home:[166,468],size:.37,phase:'liquid',t:0},{kind:9,home:[116,488],size:.27,phase:'liquid',t:0}
+];
+const moleculeLayer=$('moleculeLayer');
+particleDefs.forEach((p,i)=>{
+  const m=moleculeMarkup(p.kind,p.size,true);
+  const g=document.createElementNS('http://www.w3.org/2000/svg','g');
+  g.setAttribute('class','moleculeParticle');g.setAttribute('id',`particle${i}`);
+  g.innerHTML=m.markup;
+  moleculeLayer.appendChild(g);p.el=g;p.mol=m;
+  const mobileGroup=document.createElementNS('http://www.w3.org/2000/svg','g');
+  mobileGroup.setAttribute('class','moleculeParticle');mobileGroup.setAttribute('id',`mobileParticle${i}`);
+  mobileGroup.innerHTML=moleculeMarkup(p.kind,p.kind===6?.29:.24,true).markup;
+  $('mobileMoleculeLayer').appendChild(mobileGroup);p.mobileEl=mobileGroup;
+});
+
+function calcStage(){
+  if(state.receiver===2 && state.temp>=138) return 4;
+  if(state.temp>=122 || state.collected1>=66) return 3;
+  if(state.temp>=88 || state.collected1>2) return 2;
+  if(state.temp>=64) return 1;
+  return 0;
+}
+function getHexRate(){return smooth(63,78,state.temp)*(1-smooth(112,132,state.temp));}
+function getNonaneRate(){return smooth(139,157,state.temp)*(1-smooth(164,171,state.temp));}
+function boilIntensity(){return Math.max(getHexRate(),getNonaneRate()*.92)*100;}
+function updateStage(){
+  const st=calcStage();state.stage=st;
+  document.querySelectorAll('.stage-item').forEach((el,i)=>{
+    el.classList.toggle('active',i===st);el.classList.toggle('done',i<st);
+  });
+  $('stageExplanation').textContent=stageDescriptions[st];
+  $('sideTemp').textContent=state.temp.toFixed(1);
+  $('boilRead').textContent=Math.round(boilIntensity());
+  $('statusText').textContent = state.runMode==='auto'?'گرم‌کردن خودکار':state.runMode==='paused'?'آزمایش در مکث':state.runMode==='manual'?'تنظیم دستی دما':'آماده شروع آزمایش';
+  $('statusDot').style.color=state.runMode==='paused'?'#ffd166':state.runMode==='off'?'#7aa3bd':'#61e2b5';
+  $('fraction1Amount').textContent=Math.round(state.collected1);
+  $('fraction2Amount').textContent=Math.round(state.collected2);
+  $('fraction1Meter').style.width=clamp(state.collected1,0,100)+'%';
+  $('fraction2Meter').style.width=clamp(state.collected2,0,100)+'%';
+  $('residualLabel').textContent=state.collected1<10?'غنی از هر دو جزء':state.collected1<65?'نسبتاً غنی از نونان':'نونان‌غنی‌تر';
+  $('swapBtn').disabled=!(state.receiver===1 && state.collected1>=18 && state.temp>=112);
+  $('receiverLabel').textContent=state.receiver===1?'بخش اول':'بخش دوم';
+  $('tempValue').textContent=state.temp.toFixed(1);
+  $('tempSlider').value=state.temp;
+  $('svgTempText').textContent=state.temp.toFixed(1)+'°C';$('mSvgTempText').textContent=state.temp.toFixed(1)+'°C';$('mReceiverLabel').textContent=state.receiver===1?'بخش اول':'بخش دوم';
+}
+function updateHeatVisuals(){
+  const t=state.temp;
+  const level=clamp((t-20)/150,0,1);
+  const fluidY=445 + (state.collected1/100)*15;
+  $('flaskLiquid').setAttribute('y',fluidY);
+  $('flaskLiquid').setAttribute('height',545-fluidY);
+  $('flaskSurface').setAttribute('transform',`translate(0 ${fluidY-420})`);
+  const h=clamp((t-20)/150,0,1)*90;
+  $('thermoMercury').setAttribute('y',195-h);
+  $('thermoMercury').setAttribute('height',Math.max(3,h));
+  $('thermoBulb').setAttribute('fill', t<55?'#e77954':t<115?'#ff9b47':'#ff514b');
+  $('mThermoMercury').setAttribute('y',195-h);$('mThermoMercury').setAttribute('height',Math.max(3,h));$('mThermoBulb').setAttribute('fill',t<55?'#e77954':t<115?'#ff9b47':'#ff514b');
+  $('heatGlow').setAttribute('opacity',String(.08+level*.72));$('mHeatGlow').setAttribute('opacity',String(.08+level*.72));
+  const mFluidY=320+(state.collected1/100)*12;$('mFlaskLiquid').setAttribute('y',mFluidY);$('mFlaskLiquid').setAttribute('height',410-mFluidY);$('mFlaskSurface').setAttribute('transform',`translate(0 ${mFluidY-318})`);
+  const intensity=boilIntensity()/100;
+  $('bubbles').style.opacity=String(clamp((intensity-.04)*1.8,0,1));$('mBubbles').style.opacity=String(clamp((intensity-.04)*1.8,0,1));
+  document.querySelectorAll('#bubbles .bubble').forEach((b,i)=>{
+    b.style.visibility=i<Math.ceil(intensity*8)?'visible':'hidden';
+    b.style.opacity=String(clamp((intensity-.06)*1.8,0,.95));
+    b.style.animationDuration=(prefersReduced?3.8:Math.max(.75,2.8-intensity*1.8+i*.035))+'s';
+  });
+  document.querySelectorAll('#mBubbles .bubble').forEach((b,i)=>{b.style.visibility=i<Math.ceil(intensity*5)?'visible':'hidden';b.style.animationDuration=(prefersReduced?3.8:Math.max(.75,2.8-intensity*1.8+i*.05))+'s';});
+  const active=state.receiver===1?state.collected1:state.collected2;
+  const height=clamp(active/100,0,1)*52;
+  $('receiverLiquid').setAttribute('y',530-height);
+  $('receiverLiquid').setAttribute('height',height+2);
+  $('receiverSurface').setAttribute('transform',`translate(0 ${530-height-516})`);
+  $('mReceiverLiquid').setAttribute('y',384-height);$('mReceiverLiquid').setAttribute('height',height+2);$('mReceiverSurface').setAttribute('transform',`translate(0 ${384-height-376})`);
+  const mDrop=$('mFallingDrop');mDrop.style.opacity=String(clamp(intensity*1.25,0,1));mDrop.style.animationDuration=(prefersReduced?2.5:Math.max(.7,1.7-intensity*.8))+'s';
+  const drop=$('fallingDrop');
+  drop.style.opacity=String(clamp(intensity*1.25,0,1));
+  drop.style.animationDuration=(prefersReduced?2.5:Math.max(.7,1.7-intensity*.8))+'s';
+  // Steam is more abundant in the appropriate boiling range.
+  document.querySelectorAll('.steam-flow').forEach(el=>el.style.opacity=String(.13+Math.max(getHexRate(),getNonaneRate())*.8));
+  document.querySelectorAll('.water-flow').forEach(el=>el.style.opacity=state.sound?'0.85':'.7');
+}
+function updateParticles(now){
+  const hRate=getHexRate(), nRate=getNonaneRate();
+  const first=clamp(state.collected1/68,0,1), second=clamp(state.collected2/55,0,1);
+  const phaseCountHex=Math.round(clamp(Math.max(hRate*.85,first)*4,0,4));
+  const phaseCountNon=Math.round(clamp((state.receiver===2?Math.max(nRate*.85,second):nRate*.12)*3,0,3));
+  let hexIdx=0,nonIdx=0;
+  const path=[ [255,210],[410,210],[525,270],[650,340],[770,405],[850,438],[915,458] ];
+  const mobilePath=[[111,206],[204,206],[250,238],[293,266],[328,286],[350,311],[367,332]];
+  const pointOn=(arr,t)=>{const q=clamp(t,0,.999)*(arr.length-1),i=Math.floor(q),f=q-i;const a=arr[i],b=arr[i+1];return [a[0]+(b[0]-a[0])*f,a[1]+(b[1]-a[1])*f];};
+  const pointOnPath=(t)=>pointOn(path,t);
+  particleDefs.forEach((p,i)=>{
+    let x,y,rot=0,opacity=1;
+    const thermal=clamp((state.temp-20)/150,0,1);
+    const mobility=(.45+thermal*2.9)*(prefersReduced?.35:1);
+    const wave=Math.sin(now/(1450-thermal*720)+i*2.3)*mobility;
+    if(p.kind===6 && hexIdx<phaseCountHex){
+      const local=hexIdx++;const base=.03+first*.66+local*.035;const cooling=smooth(.38,.82,base);const t=clamp(base+((now/8500)%0.12)*(1-cooling*.75),0,1);
+      [x,y]=pointOnPath(t);rot=18;
+      opacity=.95;
+    } else if(p.kind===9 && nonIdx<phaseCountNon){
+      const local=nonIdx++;const base=.58+second*.22+local*.035;const cooling=smooth(.38,.82,base);const t=clamp(base+((now/12000)%0.06)*(1-cooling*.75),0,1);
+      [x,y]=pointOnPath(t);rot=18;opacity=.95;
+    } else {
+      x=p.home[0]+Math.sin(now/1000+i*1.9)* (prefersReduced?1:2.7);
+      y=p.home[1]+wave;
+      rot=Math.sin(now/1400+i)*5;
+      if(p.kind===6) x += hRate*2.0;
+      if(p.kind===9) x -= nRate*1.1;
+    }
+    p.el.setAttribute('transform',`translate(${x} ${y}) rotate(${rot})`);
+    p.el.style.opacity=opacity;
+    let mx,my;
+    const isInVapor=(p.kind===6? (particleDefs.filter((q,j)=>q.kind===6).indexOf(p)<phaseCountHex) : (particleDefs.filter((q,j)=>q.kind===9).indexOf(p)<phaseCountNon));
+    if(isInVapor){
+      const order=particleDefs.filter(q=>q.kind===p.kind).indexOf(p);
+      const mb=p.kind===6?.03+first*.66+order*.035:.58+second*.22+order*.035;const mc=smooth(.38,.82,mb);const mt=clamp(mb+(p.kind===6?(now/8500)%0.12:(now/12000)%0.06)*(1-mc*.75),0,1);
+      [mx,my]=pointOn(mobilePath,mt);
+    } else {
+      const home=p.kind===6?[[48,324],[72,342],[94,322],[63,357]][particleDefs.filter(q=>q.kind===6).indexOf(p)]:[[50,357],[84,360],[101,340],[36,347]][particleDefs.filter(q=>q.kind===9).indexOf(p)];
+      const mWave=Math.sin(now/(1250-thermal*560)+i*2.1)*(.8+thermal*1.7)*(prefersReduced?.3:1);
+      mx=home[0]+Math.sin(now/950+i)*(.8+thermal*1.4);my=home[1]+mWave;
+    }
+    p.mobileEl.setAttribute('transform',`translate(${mx} ${my}) rotate(${rot*.55})`);
+    p.mobileEl.style.opacity=opacity;
+  });
+}
+function setTemp(v,source='slider'){
+  state.temp=clamp(Number(v),20,170);
+  if(source==='slider' && state.runMode!=='paused') state.runMode='manual';
+  updateStage();updateHeatVisuals();
+}
+function showToast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');clearTimeout(state.toastTimer);state.toastTimer=setTimeout(()=>t.classList.remove('show'),2300);}
+
+// Web Audio: no external assets; short, quiet synthesized cues only after explicit opt-in.
+async function initAudio(){
+  const AC=window.AudioContext||window.webkitAudioContext;
+  if(!AC){showToast('مرورگر این دستگاه از صدای تولیدشده پشتیبانی نمی‌کند.');return false;}
+  if(!state.audio){
+    state.audio=new AC();
+    state.gain=state.audio.createGain();
+    // The former master gain was too low to be audible on many laptop speakers.
+    // This remains deliberately soft while bringing the synthesized cues into range.
+    state.gain.gain.value=state.volume*.35;
+    state.gain.connect(state.audio.destination);
+  }
+  try{
+    if(state.audio.state!=='running') await state.audio.resume();
+  }catch(err){
+    showToast('فعال‌سازی صدا انجام نشد؛ دوباره روی دکمه صدا بزنید.');
+    return false;
+  }
+  if(state.audio.state!=='running'){
+    showToast('مرورگر اجازه پخش صدا نداد؛ یک‌بار دیگر دکمه صدا را انتخاب کنید.');
+    return false;
+  }
+  return true;
+}
+function tone(freq,duration,volume=.35,kind='sine',endFreq=null){
+  if(!state.sound||!state.audio||!state.gain)return;
+  const ctx=state.audio,osc=ctx.createOscillator(),g=ctx.createGain(),now=ctx.currentTime;
+  osc.type=kind;osc.frequency.setValueAtTime(freq,now);
+  if(endFreq)osc.frequency.exponentialRampToValueAtTime(Math.max(1,endFreq),now+duration);
+  g.gain.setValueAtTime(0,now);g.gain.linearRampToValueAtTime(volume,now+.012);g.gain.exponentialRampToValueAtTime(.0001,now+duration);
+  osc.connect(g);g.connect(state.gain);osc.start(now);osc.stop(now+duration+.02);
+}
+function clickSound(){tone(620,.045,.22,'sine',480);}
+function updateAudio(now){
+  if(!state.sound)return;
+  const boil=boilIntensity()/100;
+  if(boil>.25 && now-state.lastBubbleSound>Math.max(450,1250-boil*600)){
+    tone(125+boil*45,.12,.12,'sine',85);state.lastBubbleSound=now;
+  }
+  const collected=state.receiver===1?state.collected1:state.collected2;
+  if(collected>0 && now-state.lastDripSound>1700 && boil>.18){tone(980,.055,.07,'sine',690);state.lastDripSound=now;}
+}
+
+let lastT=performance.now();
+function frame(now){
+  const dt=Math.min(.05,Math.max(0,(now-lastT)/1000));lastT=now;
+  const scaledDt=dt*state.speed*(prefersReduced?.55:1);
+  let autoStopMessage=null;
+  if(state.runMode==='auto'){
+    const next=state.temp+scaledDt*4.1;
+    // Keep the final boiling frame active for collection before pausing at the endpoint.
+    if(state.receiver===1 && next>=128){
+      state.temp=128;
+      autoStopMessage=state.collected1>=18?'بخش اول آماده است؛ ظرف گیرنده را تعویض کنید.':'برای جمع‌آوری بخش اول، دما را در محدوده هگزان نگه دارید و آزمایش را ادامه دهید.';
+    }
+    else if(state.receiver===2 && next>=165){
+      state.temp=165;
+      autoStopMessage='تقطیر بخش دوم به پایان رسید.';
+    }
+    else state.temp=Math.min(next,170);
+  }
+  if(state.runMode==='auto'||state.runMode==='manual'){
+    const h=getHexRate(),n=getNonaneRate();
+    if(state.receiver===1 && state.temp<=128 && state.collected1<70){
+      state.collected1=Math.min(70,state.collected1+scaledDt*h*3.4);
+    }
+    // The second fraction is collected over the broader nonane-rich boiling range.
+    // A larger illustrative collection scale makes the gradual rise clearly visible
+    // during the short automatic run, without making it instantaneous.
+    if(state.receiver===2 && state.temp>=135 && state.collected2<100){
+      state.collected2=Math.min(100,state.collected2+scaledDt*n*15);
+    }
+  }
+  if(autoStopMessage){state.runMode='paused';showToast(autoStopMessage);}
+  updateStage();updateHeatVisuals();updateParticles(now);updateAudio(now);
+  requestAnimationFrame(frame);
+}
+
+// Temperature and transport controls.
+$('tempSlider').addEventListener('input',e=>{setTemp(e.target.value,'slider');});
+$('autoBtn').addEventListener('click',()=>{clickSound();state.autoStarted=true;state.runMode='auto';if(state.receiver===1&&state.temp>=128){showToast('ابتدا ظرف گیرنده را برای جمع‌آوری بخش دوم تعویض کنید.');state.runMode='paused';}else showToast('گرم‌کردن خودکار آغاز شد.');});
+$('pauseBtn').addEventListener('click',()=>{clickSound();state.runMode='paused';showToast('آزمایش متوقف شد؛ دما ثابت می‌ماند.');});
+$('continueBtn').addEventListener('click',()=>{clickSound();state.runMode=state.autoStarted?'auto':'manual';showToast('شبیه‌سازی ادامه پیدا کرد.');});
+$('stepBtn').addEventListener('click',()=>{
+  clickSound();state.runMode='paused';
+  const idx=state.stepIndex;const targets=[48,76,98,128,153];
+  if(idx===4 && state.receiver===1){state.temp=128;state.collected1=Math.max(state.collected1,60);updateStage();updateHeatVisuals();showToast('برای آغاز تقطیر بخش دوم، ابتدا ظرف گیرنده را تعویض کنید.');return;}
+  state.temp=targets[idx];
+  if(idx===2)state.collected1=Math.max(state.collected1,20);
+  if(idx===3)state.collected1=Math.max(state.collected1,60);
+  if(idx===4)state.collected2=Math.max(state.collected2,4);
+  state.stepIndex=(idx+1)%5;
+  updateStage();updateHeatVisuals();showToast(`گام ${idx+1} از ۵`);
+});
+document.querySelectorAll('.speed-btn').forEach(btn=>btn.addEventListener('click',()=>{
+  state.speed=Number(btn.dataset.speed);document.querySelectorAll('.speed-btn').forEach(b=>b.classList.toggle('selected',b===btn));clickSound();
+}));
+$('swapBtn').addEventListener('click',()=>{
+  if(state.receiver!==1 || !(state.temp>=118 || state.collected1>=55))return;
+  clickSound();state.receiver=2;state.collected2=0;state.runMode='paused';state.autoStarted=true;
+  updateStage();updateHeatVisuals();showToast('ظرف دوم وارد شد؛ اکنون بخش نونان‌غنی جمع‌آوری می‌شود.');
+});
+$('resetBtn').addEventListener('click',()=>{
+  clickSound();state.temp=20;state.runMode='off';state.autoStarted=false;state.receiver=1;state.collected1=0;state.collected2=0;state.stepIndex=0;state.lastBubbleSound=0;state.lastDripSound=0;
+  updateStage();updateHeatVisuals();showToast('آزمایش به حالت آغازین بازگشت.');
+});
+$('labelsBtn').addEventListener('click',()=>{
+  state.showLabels=!state.showLabels;$('stagePanel').classList.toggle('labels-hidden',!state.showLabels);
+  $('labelsBtn').classList.toggle('active',state.showLabels);$('labelsBtn').setAttribute('aria-pressed',String(state.showLabels));clickSound();
+});
+$('moleculesBtn').addEventListener('click',()=>{
+  state.showMolecules=!state.showMolecules;$('stagePanel').classList.toggle('molecules-hidden',!state.showMolecules);
+  $('moleculesBtn').classList.toggle('active',state.showMolecules);$('moleculesBtn').setAttribute('aria-pressed',String(state.showMolecules));clickSound();
+});
+$('soundBtn').addEventListener('click',async()=>{
+  if(!state.sound){
+    if(!await initAudio())return;
+    state.sound=true;
+    $('soundBtn').classList.add('active');
+    $('soundBtn').setAttribute('aria-pressed','true');
+    $('soundBtn').innerHTML='<span class="ico">♫</span><span class="btn-text">صدا روشن</span>';
+    tone(660,.12,.2,'sine',520);
+    showToast('صدا فعال شد. شدت صدا را می‌توانید تنظیم کنید.');
+  }
+  else {
+    state.sound=false;
+    $('soundBtn').classList.remove('active');
+    $('soundBtn').setAttribute('aria-pressed','false');
+    $('soundBtn').innerHTML='<span class="ico">♪</span><span class="btn-text">صدا خاموش</span>';
+  }
+});
+$('volume').addEventListener('input',e=>{state.volume=Number(e.target.value)/100;if(state.gain)state.gain.gain.setTargetAtTime(state.volume*.35,state.audio.currentTime,.03);});
+$('fullscreenBtn').addEventListener('click',async()=>{
+  try{if(!document.fullscreenElement){await document.documentElement.requestFullscreen();}else{await document.exitFullscreen();}}
+  catch(err){showToast('تمام‌صفحه در این مرورگر یا پنجره در دسترس نیست.');}
+});
+document.addEventListener('fullscreenchange',()=>{$('fullscreenBtn').innerHTML=document.fullscreenElement?'<span class="ico">⛶</span><span class="btn-text">خروج از تمام‌صفحه</span>':'<span class="ico">⛶</span><span class="btn-text">تمام‌صفحه</span>';});
+
+// Device component hotspots.
+function selectPart(key){const p=parts[key];if(!p)return;$('partName').textContent=p[0];$('partText').textContent=p[1];document.querySelectorAll('.hotspot').forEach(x=>x.classList.toggle('part-highlight',x.dataset.part===key));}
+document.querySelectorAll('.hotspot').forEach(el=>{
+  el.addEventListener('click',()=>{selectPart(el.dataset.part);clickSound();});
+  el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();selectPart(el.dataset.part);clickSound();}});
+});
+
+// Modal content and interactive quiz.
+const modal=$('modalBackdrop');let currentTab='guide';
+function renderGuide(){
+  const items=Object.entries(parts).map(([k,v])=>`<div class="guide-item"><b>${v[0]}</b><span>${v[1]}</span></div>`).join('');
+  return `<div class="modal-content"><p>در این آزمایش، مخلوط آموزشی <bdi>n-هگزان</bdi> و <bdi>n-نونان</bdi> را گرم می‌کنیم. بخارِ غنی‌تر از جزء فرّارتر وارد مبرد می‌شود و پس از سردشدن به مایع تبدیل می‌شود.</p><div class="guide-grid">${items}</div><div class="notice">نکته ایمنی و علمی: این شبیه‌سازی برای آموزش مفهومی است و اجرای واقعی تقطیر هگزان و نونان به دلیل اشتعال‌پذیری و خطرات بخارات، فقط در آزمایشگاه مجهز و زیر نظر متخصص مجاز است. در شبیه‌سازی از شعله مستقیم استفاده نشده است.</div><h3>چطور آزمایش را اجرا کنیم؟</h3><p>۱) نشانگر دما را جابه‌جا کنید یا «شروع خودکار» را بزنید. ۲) نزدیک محدوده هگزان، تشکیل حباب و انتقال بخار را ببینید. ۳) بعد از آماده‌شدن بخش اول، ظرف گیرنده را تعویض کنید. ۴) دما را تا محدوده نونان بالا ببرید و بخش دوم را مشاهده کنید.</p><p>با کلیک روی اجزای دستگاه نیز می‌توانید وظیفه هرکدام را در پنل کنار دستگاه بخوانید.</p></div>`;
+}
+function renderMolecules(){
+ return `<div class="modal-content"><p>هر دو ماده از خانواده آلکان‌ها هستند. مولکول‌های نمایش‌داده‌شده مدل توپ‌ومیله‌ای‌اند: کربن‌ها تیره و هیدروژن‌ها روشن‌اند. تعداد مولکول‌های داخل دستگاه فقط نمونه‌ای آموزشی است و مقیاس واقعی را نشان نمی‌دهد.</p><div class="molecule-comparison">
+ <article class="mol-card"><h3>n-هگزان</h3><div class="formula">C₆H₁₄</div>${comparisonSvg(6)}<div class="mol-stats"><div>اتم کربن<b>۶</b></div><div>اتم هیدروژن<b>۱۴</b></div><div>نقطه جوش خالص<b>68.7°C</b></div><div>فرّاریت نسبی<b>بیشتر</b></div></div></article>
+ <article class="mol-card"><h3>n-نونان</h3><div class="formula">C₉H₂₀</div>${comparisonSvg(9)}<div class="mol-stats"><div>اتم کربن<b>۹</b></div><div>اتم هیدروژن<b>۲۰</b></div><div>نقطه جوش خالص<b>150.8°C</b></div><div>فرّاریت نسبی<b>کمتر</b></div></div></article>
+ </div><div class="notice">دمای 68.7 و 150.8 درجه سانتی‌گراد، نقطه جوش مواد خالص در فشار یک اتمسفر است؛ نه دمای ثابت و قطعی جوش مخلوط. رفتار مخلوط به نسبت اجزا و فشار بستگی دارد.</div></div>`;
+}
+function renderResult(){
+ return `<div class="modal-content"><div class="result-box"><h3>چرا هگزان زودتر تقطیر می‌شود؟</h3><p>هگزان نقطه جوش پایین‌تری دارد و فرّارتر است؛ بنابراین در دمای پایین‌تری سهم بیشتری از آن وارد فاز بخار می‌شود. بخار مخلوط، معمولاً از هگزان غنی‌تر از مایع اولیه است، اما کاملاً خالص نیست.</p></div><div class="result-box"><h3>چرا بخار در مبرد دوباره مایع می‌شود؟</h3><p>آب خنک‌کننده از جداره بیرونی مبرد عبور می‌کند و گرما را از بخار داخل لوله می‌گیرد. با کاهش دما، مولکول‌های بخار به هم نزدیک‌تر می‌شوند و قطره‌های مایع تشکیل می‌دهند. آب خنک‌کننده و بخار در دو مسیر جدا هستند و با هم مخلوط نمی‌شوند.</p></div><div class="result-box"><h3>چه چیزی در بالن باقی می‌ماند؟</h3><p>با خارج‌شدن تدریجی بخش هگزان‌غنی، مایع باقی‌مانده نسبتاً از نونان غنی‌تر می‌شود. با افزایش بیشتر دما، بخار خروجی نیز می‌تواند از نونان غنی‌تر شود؛ سپس آن را در ظرف دوم جمع‌آوری می‌کنیم.</p></div><div class="notice">در مخلوط واقعی، بخار می‌تواند هر دو هیدروکربن را داشته باشد و ترکیب بخار و مایع پیوسته تغییر می‌کند. این مدل آموزشی رفتار تعادلی و تغییر ترکیب را ساده‌سازی می‌کند و جداسازی صددرصدی یا ناگهانی را نشان نمی‌دهد.</div></div>`;
+}
+const questions=[
+ {q:'کدام ماده در این مخلوط فرّارتر است و معمولاً زودتر وارد بخار می‌شود؟',a:['n-هگزان','n-نونان'],correct:0,why:'هگزان نقطه جوش خالص پایین‌تری دارد (حدود 68.7°C)، بنابراین در شرایط مشابه فرّارتر است.'},
+ {q:'در مبرد لیبیگ، آب خنک‌کننده در کدام مسیر حرکت می‌کند؟',a:['داخل لوله‌ای که بخار از آن می‌گذرد','در فضای جداره بیرونی لوله داخلی'],correct:1,why:'بخار در لوله داخلی و آب در جداره بیرونی جریان دارد؛ دو سیال با یکدیگر مخلوط نمی‌شوند.'},
+ {q:'پس از جمع‌آوری بخش هگزان‌غنی، ترکیب مایع باقی‌مانده در بالن چگونه تغییر می‌کند؟',a:['نسبتاً از نونان غنی‌تر می‌شود','به‌طور ناگهانی فقط هگزان می‌ماند'],correct:0,why:'هگزان به‌تدریج بیشتر از بالن خارج می‌شود؛ بنابراین سهم نسبی نونان در مایع باقی‌مانده افزایش می‌یابد.'}
+];
+function renderQuiz(){
+ return `<div class="modal-content"><p>به هر پرسش پاسخ دهید؛ بازخورد و دلیل پاسخ بلافاصله نمایش داده می‌شود.</p>${questions.map((q,i)=>`<div class="quiz-q" data-question="${i}"><h3>${i+1}. ${q.q}</h3><div class="quiz-options">${q.a.map((a,j)=>`<button class="quiz-option" data-answer="${j}">${a}</button>`).join('')}</div><div class="quiz-feedback" aria-live="polite"></div></div>`).join('')}</div>`;
+}
+function openTab(tab){
+ currentTab=tab;document.querySelectorAll('.modal-tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));
+ $('modalTitle').textContent={guide:'راهنمای آزمایش و اجزای دستگاه',molecules:'مقایسه مولکول‌ها',result:'نتیجه و تفسیر علمی',quiz:'آزمون کوتاه'}[tab];
+ $('modalContent').innerHTML=({guide:renderGuide,molecules:renderMolecules,result:renderResult,quiz:renderQuiz})[tab]();
+ if(tab==='quiz')wireQuiz();
+}
+function wireQuiz(){document.querySelectorAll('.quiz-q').forEach(box=>{
+ const idx=Number(box.dataset.question),q=questions[idx];box.querySelectorAll('.quiz-option').forEach(btn=>btn.addEventListener('click',()=>{
+  const ans=Number(btn.dataset.answer);box.querySelectorAll('.quiz-option').forEach((b,j)=>{b.disabled=true;if(j===q.correct)b.classList.add('correct');else if(j===ans)b.classList.add('wrong');});
+  box.querySelector('.quiz-feedback').textContent=(ans===q.correct?'✓ پاسخ درست است. ':'✕ این پاسخ درست نیست. ')+q.why;clickSound();
+ }));
+ });}
+function showModal(tab='guide'){openTab(tab);modal.classList.add('open');$('closeModal').focus();}
+function hideModal(){modal.classList.remove('open');}
+$('guideBtn').addEventListener('click',()=>{showModal('guide');clickSound();});
+document.querySelectorAll('.modal-tab').forEach(b=>b.addEventListener('click',()=>{openTab(b.dataset.tab);clickSound();}));
+$('closeModal').addEventListener('click',hideModal);
+modal.addEventListener('click',e=>{if(e.target===modal)hideModal();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&modal.classList.contains('open'))hideModal();});
+
+// Initial state and animation loop.
+updateStage();updateHeatVisuals();selectPart('flask');
+requestAnimationFrame((t)=>{lastT=t;requestAnimationFrame(frame);});
+})();
+</script>
+</body>
+</html>
